@@ -13,3 +13,7 @@ def readints():
 
 def prod(numbers):
     return functools.reduce(operator.mul, numbers)
+
+
+def count(validator, iterable):
+    return sum(1 for item in iterable if item and validator(item))
