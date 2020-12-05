@@ -11,6 +11,18 @@ def readints():
     return (int(line.strip()) for line in sys.stdin.readlines())
 
 
+def readchunks():
+    chunk = ""
+    for line in sys.stdin.readlines():
+        if line != "\n":
+            chunk += line
+        elif chunk:
+            yield chunk
+            chunk = ""
+    if chunk:
+        yield chunk
+
+
 def prod(numbers):
     return functools.reduce(operator.mul, numbers)
 
