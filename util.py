@@ -8,7 +8,9 @@ def readlines():
 
 
 def readints():
-    return (int(line.strip()) for line in sys.stdin.readlines())
+    for line in sys.stdin.readlines():
+        for n in line.strip().split(","):
+            yield int(n)
 
 
 def readchunks():
