@@ -2,16 +2,16 @@
 
 My solutions to [Advent of Code 2020](https://adventofcode.com/2020/).
 
-All solutions are written in Python 3.8 and use only standard library utilities.
+All solutions are written for Python 3.8+ and use only standard library utilities.
 
-All solutions read the puzzle input from stdin and write the answer to stdout. E.g.:
+All solution files can be executed without arguments on the command line. The script assumes there is a matching input file under an `input` directory relative to the script. E.g. `./day01a.py` will try to read `./input/day01`.
 
-    $ python day01a.py < input-file
+    $ python3 day01a.py
     719796
 
-The `runall.py` script can be used to excecute all solutions against the repo input files:
+The `runall.py` script can be used to execute all solution files in the repo:
 
-    $ python runall.py
+    $ python3 runall.py
     day01a.py: 888331
         (0.005 s)
     day01b.py: 130933530
