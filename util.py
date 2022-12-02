@@ -7,9 +7,19 @@ import sys
 
 @contextlib.contextmanager
 def inputfile():
-    if not sys.argv or not sys.argv[0]:
-        raise RuntimeError("No executing script")
-    dirpart, filepart = os.path.split(sys.argv[0])
+    if sys.argv and sys.argv[0]:
+        # Find inputfile based on executing script
+        dirpart, filepart = os.path.split(sys.argv[0])
+    else:
+        # Find inputfile based on the module calling us (useful with REPL)
+        import inspect
+
+        for frame in reversed(inspect.stack()):
+            if frame.filename != __file__ and frame.filename != "<stdin>":
+                dirpart, filepart = os.path.split(frame.filename)
+                break
+        else:
+            raise RuntimeError("No executing script")
     day, _ = os.path.splitext(filepart)
     day = day.rstrip("ab")
     with open(os.path.join(dirpart, "input", day), "r") as f:
