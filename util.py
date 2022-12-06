@@ -31,6 +31,11 @@ def readlines():
         return (line.strip() for line in f.readlines())
 
 
+def read():
+    with inputfile() as f:
+        return f.read()
+
+
 def readchunks():
     with inputfile() as f:
         chunk = ""
