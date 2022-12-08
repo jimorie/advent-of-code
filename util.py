@@ -49,6 +49,15 @@ def readchunks():
             yield chunk
 
 
+def readlinegroups(lines_per_group):
+    group = []
+    for line in readlines():
+        group.append(line)
+        if len(group) >= lines_per_group:
+            yield group
+            group = []
+
+
 def readints():
     for line in readlines():
         for n in line.split(","):
