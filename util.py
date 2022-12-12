@@ -88,6 +88,9 @@ def unique_product(args, index=0):
 
 
 class Position(tuple):
+    CARDINAL_DIRECTIONS = ((0, 1), (1, 0), (-1, 0), (0, -1))
+    ORDINAL_DIRECTIONS = ((1, 1), (1, -1), (-1, -1), (-1, 1))
+
     @property
     def x(self):
         return self[0]
@@ -117,6 +120,16 @@ class Position(tuple):
             )
         )
 
+    @property
+    def cardinals(self):
+        for direction in self.CARDINAL_DIRECTIONS:
+            yield self + direction
+
+    @property
+    def ordinals(self):
+        for direction in self.ORDINAL_DIRECTIONS:
+            yield self + direction
+
 
 class Grid:
     def __init__(self, grid):
@@ -125,9 +138,19 @@ class Grid:
     def __getitem__(self, pos):
         return self.grid[pos[1]][pos[0]]
 
+    def __setitem__(self, pos, value):
+        self.grid[pos[1]][pos[0]] = value
+
     def __iter__(self):
         return (
             Position(x, y)
+            for y in range(len(self.grid))
+            for x in range(len(self.grid[y]))
+        )
+
+    def items(self):
+        return (
+            (Position(x, y), self.grid[y][x])
             for y in range(len(self.grid))
             for x in range(len(self.grid[y]))
         )
