@@ -171,6 +171,12 @@ class Grid:
             or pos[0] == len(self.grid[pos[1]])
         )
 
+    def index(self, other):
+        for pos, value in self.items():
+            if value == other:
+                return pos
+        raise ValueError(f"{other} is not in Grid")
+
     @property
     def height(self):
         return len(self.grid)
