@@ -26,7 +26,7 @@ def trek_to_the_end(heightmap, start, end):
         pos, steps = explore.pop(0)
         steps += 1
         for next_pos in pos.cardinals:
-            if not heightmap.is_inside(next_pos):
+            if next_pos not in heightmap:
                 # Outside the map
                 continue
             if heightmap[next_pos] - heightmap[pos] > 1:

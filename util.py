@@ -148,19 +148,19 @@ class Grid:
             for x in range(len(self.grid[y]))
         )
 
-    def items(self):
-        return (
-            (Position(x, y), self.grid[y][x])
-            for y in range(len(self.grid))
-            for x in range(len(self.grid[y]))
-        )
-
-    def is_inside(self, pos):
+    def __contains__(self, pos):
         return (
             pos[1] >= 0
             and pos[1] < len(self.grid)
             and pos[0] >= 0
             and pos[0] < len(self.grid[pos[1]])
+        )
+
+    def items(self):
+        return (
+            (Position(x, y), self.grid[y][x])
+            for y in range(len(self.grid))
+            for x in range(len(self.grid[y]))
         )
 
     def is_edge(self, pos):
