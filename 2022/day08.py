@@ -2,7 +2,7 @@ import util
 
 
 def read_forest():
-    return util.Grid([[int(c) for c in line] for line in util.readlines()])
+    return util.Grid((int(c) for c in line) for line in util.readlines())
 
 
 def treeview(forest, position, direction):

@@ -113,12 +113,7 @@ class Position(tuple):
         return self._apply(other, operator.sub)
 
     def _apply(self, other, oper):
-        return self.__class__(
-            *(
-                oper(self[i], (other[i] if i < len(other) else 0))
-                for i in range(len(self))
-            )
-        )
+        return self.__class__(*(oper(a, b) for a, b in zip(self, other)))
 
     @property
     def cardinals(self):
@@ -131,44 +126,24 @@ class Position(tuple):
             yield self + direction
 
 
-class Grid:
-    def __init__(self, grid):
-        self.grid = grid
-
-    def __getitem__(self, pos):
-        return self.grid[pos[1]][pos[0]]
-
-    def __setitem__(self, pos, value):
-        self.grid[pos[1]][pos[0]] = value
-
-    def __iter__(self):
-        return (
-            Position(x, y)
-            for y in range(len(self.grid))
-            for x in range(len(self.grid[y]))
-        )
-
-    def __contains__(self, pos):
-        return (
-            pos[1] >= 0
-            and pos[1] < len(self.grid)
-            and pos[0] >= 0
-            and pos[0] < len(self.grid[pos[1]])
-        )
-
-    def items(self):
-        return (
-            (Position(x, y), self.grid[y][x])
-            for y in range(len(self.grid))
-            for x in range(len(self.grid[y]))
-        )
+class Grid(dict):
+    def __init__(self, rows=None):
+        if rows:
+            for y, row in enumerate(rows):
+                self.height = y
+                for x, value in enumerate(row):
+                    self[Position(x, y)] = value
+                    self.width = x
+        else:
+            self.height = None
+            self.width = None
 
     def is_edge(self, pos):
         return (
             pos[1] == 0
-            or pos[1] == len(self.grid) - 1
+            or pos[1] == self.height - 1
             or pos[0] == 0
-            or pos[0] == len(self.grid[pos[1]])
+            or pos[0] == self.width - 1
         )
 
     def index(self, other):
@@ -178,17 +153,9 @@ class Grid:
         raise ValueError(f"{other} is not in Grid")
 
     @property
-    def height(self):
-        return len(self.grid)
-
-    @property
-    def width(self):
-        return len(self.grid[0]) if self.grid else 0
-
-    @property
     def inner(self):
         return (
             Position(x, y)
-            for y in range(1, len(self.grid) - 1)
-            for x in range(1, len(self.grid[y]) - 1)
+            for y in range(1, self.height - 1)
+            for x in range(1, self.width - 1)
         )
