@@ -90,6 +90,14 @@ def unique_product(args, index=0):
 class Position(tuple):
     CARDINAL_DIRECTIONS = ((0, 1), (1, 0), (-1, 0), (0, -1))
     ORDINAL_DIRECTIONS = ((1, 1), (1, -1), (-1, -1), (-1, 1))
+    SPACE_DIRECTIONS = (
+        (0, 1, 0),
+        (1, 0, 0),
+        (-1, 0, 0),
+        (0, -1, 0),
+        (0, 0, 1),
+        (0, 0, -1),
+    )
 
     @property
     def x(self):
@@ -107,13 +115,10 @@ class Position(tuple):
         return super().__new__(cls, args)
 
     def __add__(self, other):
-        return self._apply(other, operator.add)
+        return self.__class__(*(a + b for a, b in zip(self, other)))
 
     def __sub__(self, other):
-        return self._apply(other, operator.sub)
-
-    def _apply(self, other, oper):
-        return self.__class__(*(oper(a, b) for a, b in zip(self, other)))
+        return self.__class__(*(a - b for a, b in zip(self, other)))
 
     @property
     def cardinals(self):
@@ -123,6 +128,11 @@ class Position(tuple):
     @property
     def ordinals(self):
         for direction in self.ORDINAL_DIRECTIONS:
+            yield self + direction
+
+    @property
+    def neighbours_3d(self):
+        for direction in self.SPACE_DIRECTIONS:
             yield self + direction
 
 
