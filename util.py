@@ -87,7 +87,18 @@ def unique_product(args, index=0):
                     yield (arg,) + suffix
 
 
-class Position(tuple):
+class Vector(tuple):
+    def __new__(cls, *args):
+        return super().__new__(cls, args)
+
+    def __add__(self, other):
+        return self.__class__(*(a + b for a, b in zip(self, other)))
+
+    def __sub__(self, other):
+        return self.__class__(*(a - b for a, b in zip(self, other)))
+
+
+class Position(Vector):
     CARDINAL_DIRECTIONS = ((0, 1), (1, 0), (-1, 0), (0, -1))
     ORDINAL_DIRECTIONS = ((1, 1), (1, -1), (-1, -1), (-1, 1))
     SPACE_DIRECTIONS = (
@@ -110,15 +121,6 @@ class Position(tuple):
     @property
     def z(self):
         return self[2]
-
-    def __new__(cls, *args):
-        return super().__new__(cls, args)
-
-    def __add__(self, other):
-        return self.__class__(*(a + b for a, b in zip(self, other)))
-
-    def __sub__(self, other):
-        return self.__class__(*(a - b for a, b in zip(self, other)))
 
     @property
     def cardinals(self):
