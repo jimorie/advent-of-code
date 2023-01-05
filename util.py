@@ -4,6 +4,8 @@ import operator
 import os.path
 import sys
 
+from pprint import pprint  # noqa
+
 
 @contextlib.contextmanager
 def inputfile():
@@ -171,3 +173,11 @@ class Grid(dict):
             for y in range(1, self.height - 1)
             for x in range(1, self.width - 1)
         )
+
+
+OPERATORS = {
+    "+": operator.add,
+    "-": operator.sub,
+    "*": operator.mul,
+    "/": operator.floordiv,
+}
