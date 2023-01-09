@@ -99,9 +99,18 @@ class Vector(tuple):
     def __sub__(self, other):
         return self.__class__(*(a - b for a, b in zip(self, other)))
 
+    def __mul__(self, other):
+        if isinstance(other, int):
+            return self.__class__(*(a * other for a in self))
+        raise TypeError("unsupported operand for *")
+
 
 class Position(Vector):
-    CARDINAL_DIRECTIONS = ((0, 1), (1, 0), (-1, 0), (0, -1))
+    EAST = (1, 0)
+    SOUTH = (0, 1)
+    WEST = (-1, 0)
+    NORTH = (0, -1)
+    CARDINAL_DIRECTIONS = (EAST, SOUTH, WEST, NORTH)
     ORDINAL_DIRECTIONS = ((1, 1), (1, -1), (-1, -1), (-1, 1))
     SPACE_DIRECTIONS = (
         (0, 1, 0),
