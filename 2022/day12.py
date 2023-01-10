@@ -2,7 +2,7 @@ import util
 
 
 def read_heightmap():
-    heightmap = util.Grid((ord(c) for c in line) for line in util.readlines())
+    heightmap = util.Grid.from_iterable(util.readlines(), ord)
     start = heightmap.index(ord("S"))
     end = heightmap.index(ord("E"))
     heightmap[start] = ord("a")

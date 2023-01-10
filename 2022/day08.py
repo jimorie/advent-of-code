@@ -2,7 +2,7 @@ import util
 
 
 def read_forest():
-    return util.Grid((int(c) for c in line) for line in util.readlines())
+    return util.Grid.from_iterable(util.readlines(), int)
 
 
 def treeview(forest, position, direction):
@@ -18,7 +18,7 @@ def treeview(forest, position, direction):
 
 
 def is_visible(forest, position):
-    for direction in position.CARDINAL_DIRECTIONS:
+    for direction in position.CARDINALS:
         _, edge = treeview(forest, position, direction)
         if edge:
             return True
@@ -34,7 +34,7 @@ def find_scores():
     forest = read_forest()
     for position in forest.inner:
         score = 1
-        for direction in position.CARDINAL_DIRECTIONS:
+        for direction in position.CARDINALS:
             treecount, _ = treeview(forest, position, direction)
             score *= treecount
         yield score

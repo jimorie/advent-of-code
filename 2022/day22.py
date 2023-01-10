@@ -4,7 +4,7 @@ import re
 import util
 
 
-DIRS = util.Position.CARDINAL_DIRECTIONS
+DIRS = util.Direction.CARDINALS
 EAST, SOUTH, WEST, NORTH = DIRS
 
 # CORNERS represent the 8 corners of a cube as a tuple of integers. First
@@ -42,9 +42,9 @@ def walk(grid, path, start, wrapper):
     direction = EAST
     for action in path:
         if action == "L":
-            direction = rotate_direction(direction, -1)
+            direction = direction.rotate(-1)
         elif action == "R":
-            direction = rotate_direction(direction, 1)
+            direction = direction.rotate(1)
         else:
             for _ in range(action):
                 next_pos = pos + direction
@@ -58,10 +58,6 @@ def walk(grid, path, start, wrapper):
                 pos = next_pos
                 direction = next_direction
     return (pos.y + 1) * 1000 + (pos.x + 1) * 4 + DIRS.index(direction)
-
-
-def rotate_direction(direction, rotation):
-    return DIRS[(DIRS.index(direction) + rotation) % len(DIRS)]
 
 
 def wrapper_p1(pos, direction):
@@ -95,10 +91,10 @@ def wrapper_p2(grid, size, pos, direction):
             continue
         seen.add(pos)
         # Explore every direction from here that is present on the map.
-        for rotate_dir in DIRS:
-            next_pos = pos + tuple(x * size for x in rotate_dir)
+        for explore_dir in DIRS:
+            next_pos = pos + explore_dir * size
             if next_pos in grid:
-                explore.append((next_pos, rotate_corners(corners, rotate_dir)))
+                explore.append((next_pos, rotate_corners(corners, explore_dir)))
     # Calculate the relative x, y co-ordinate for this section of the map.
     x = pos.x % size
     y = pos.y % size
@@ -106,18 +102,22 @@ def wrapper_p2(grid, size, pos, direction):
     # Find the rotation of the top four corners that exactly matches the
     # order of the corners as found when rotating directly to the face.
     for rotation in range(4):
-        top_corners = tuple(corners[(i + rotation) % 4] for i in range(4))
+        top_corners = corners[rotation:4] + corners[:rotation]
         if top_corners == target_corners:
             break
         # Rotate the x, y co-ordinates.
         x, y = size - y - 1, x
     # Rotate the new direction to match.
-    next_direction = rotate_direction(direction, rotation)
+    next_direction = direction.rotate(rotation)
     # Mirror x or y co-ordinate to the correct edge.
-    if next_direction in (NORTH, SOUTH):
-        y = size - 1 if y == 0 else 0
+    if next_direction == EAST:
+        x = 0
+    elif next_direction == SOUTH:
+        y = 0
+    elif next_direction == WEST:
+        x = size - 1
     else:
-        x = size - 1 if x == 0 else 0
+        y = size - 1
     # We're done!
     return topleft_pos + (x, y), next_direction
 

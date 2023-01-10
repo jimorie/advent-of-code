@@ -24,7 +24,7 @@ def can_escape(start, cubes, known):
         seen.add(pos)
         queue.extend(
             next_pos
-            for next_pos in pos.neighbours_3d
+            for next_pos in pos.cardinals_3d
             if next_pos not in seen and next_pos not in cubes
         )
     known.update((pos, verdict) for pos in seen)
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     cubes = read_cubes()
     print(
         sum(
-            sum(neighbour not in cubes for neighbour in cube.neighbours_3d)
+            sum(neighbour not in cubes for neighbour in cube.cardinals_3d)
             for cube in cubes
         )
     )
@@ -44,7 +44,7 @@ if __name__ == "__main__":
         sum(
             sum(
                 neighbour not in cubes and can_escape(neighbour, cubes, known)
-                for neighbour in cube.neighbours_3d
+                for neighbour in cube.cardinals_3d
             )
             for cube in cubes
         )

@@ -1,5 +1,6 @@
 import contextlib
 import functools
+import itertools
 import operator
 import os.path
 import sys
@@ -94,33 +95,22 @@ class Vector(tuple):
         return super().__new__(cls, args)
 
     def __add__(self, other):
+        if isinstance(other, int):
+            return self.__class__(*(a + other for a in self))
         return self.__class__(*(a + b for a, b in zip(self, other)))
 
     def __sub__(self, other):
+        if isinstance(other, int):
+            return self.__class__(*(a - other for a in self))
         return self.__class__(*(a - b for a, b in zip(self, other)))
 
     def __mul__(self, other):
         if isinstance(other, int):
             return self.__class__(*(a * other for a in self))
-        raise TypeError("unsupported operand for *")
+        return self.__class__(*(a * b for a, b in zip(self, other)))
 
 
-class Position(Vector):
-    EAST = (1, 0)
-    SOUTH = (0, 1)
-    WEST = (-1, 0)
-    NORTH = (0, -1)
-    CARDINAL_DIRECTIONS = (EAST, SOUTH, WEST, NORTH)
-    ORDINAL_DIRECTIONS = ((1, 1), (1, -1), (-1, -1), (-1, 1))
-    SPACE_DIRECTIONS = (
-        (0, 1, 0),
-        (1, 0, 0),
-        (-1, 0, 0),
-        (0, -1, 0),
-        (0, 0, 1),
-        (0, 0, -1),
-    )
-
+class Direction(Vector):
     @property
     def x(self):
         return self[0]
@@ -133,41 +123,76 @@ class Position(Vector):
     def z(self):
         return self[2]
 
+    def rotate(self, rotation=1):
+        return self.CARDINALS[
+            (self.CARDINALS.index(self) + rotation) % len(self.CARDINALS)
+        ]
+
+
+Direction.EAST = Direction(1, 0, 0)
+Direction.SOUTH = Direction(0, 1, 0)
+Direction.WEST = Direction(-1, 0, 0)
+Direction.NORTH = Direction(0, -1, 0)
+Direction.UP = Direction(0, 0, 1)
+Direction.DOWN = Direction(0, 0, -1)
+Direction.NORTHEAST = Direction.NORTH + Direction.EAST
+Direction.SOUTHEAST = Direction.SOUTH + Direction.EAST
+Direction.SOUTHWEST = Direction.SOUTH + Direction.WEST
+Direction.NORTHWEST = Direction.NORTH + Direction.WEST
+Direction.CARDINALS = (Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.NORTH)
+Direction.ORDINALS = (
+    Direction.SOUTHEAST,
+    Direction.SOUTHWEST,
+    Direction.NORTHWEST,
+    Direction.NORTHEAST,
+)
+Direction.CARDINALS_3D = Direction.CARDINALS + (Direction.UP, Direction.DOWN)
+
+
+class Position(Direction):
     @property
     def cardinals(self):
-        for direction in self.CARDINAL_DIRECTIONS:
+        for direction in self.CARDINALS:
             yield self + direction
 
     @property
     def ordinals(self):
-        for direction in self.ORDINAL_DIRECTIONS:
+        for direction in self.ORDINALS:
             yield self + direction
 
     @property
+    def neighbours(self):
+        for direction in itertools.product(*((0, 1, -1),) * 2):
+            if direction != (0, 0):
+                yield self + direction
+
+    @property
+    def cardinals_3d(self):
+        for pos in self.cardinals:
+            yield pos
+        yield self + self.UP
+        yield self + self.DOWN
+
+    @property
     def neighbours_3d(self):
-        for direction in self.SPACE_DIRECTIONS:
-            yield self + direction
+        for direction in itertools.product(*((0, 1, -1),) * 3):
+            if direction != (0, 0, 0):
+                yield self + direction
 
 
 class Grid(dict):
-    def __init__(self, rows=None):
-        if rows:
-            for y, row in enumerate(rows):
-                self.height = y
-                for x, value in enumerate(row):
-                    self[Position(x, y)] = value
-                    self.width = x
-        else:
-            self.height = None
-            self.width = None
+    height = None
+    width = None
 
-    def is_edge(self, pos):
-        return (
-            pos[1] == 0
-            or pos[1] == self.height - 1
-            or pos[0] == 0
-            or pos[0] == self.width - 1
-        )
+    @classmethod
+    def from_iterable(cls, rows, cast=None):
+        grid = cls()
+        for y, row in enumerate(rows):
+            for x, value in enumerate(row):
+                grid[Position(x, y)] = cast(value) if cast else value
+        grid.width = x + 1
+        grid.height = y + 1
+        return grid
 
     def index(self, other):
         for pos, value in self.items():

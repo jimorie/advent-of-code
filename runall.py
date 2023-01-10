@@ -10,12 +10,12 @@ if __name__ == "__main__":
         inputdir = yeardir / "input"
         for inputfile in sorted(inputdir.glob("*")):
             for pythonfile in sorted(yeardir.glob(f"{inputfile.name}*.py")):
-                print(f"{pythonfile}: ", end="")
+                print(f"{pythonfile}: ")
                 sys.argv[0] = str(pythonfile)
                 execstart = time.time()
                 exec(pythonfile.read_text())
                 exectime = time.time() - execstart
-                print(f"    ({exectime:.3f} s)")
+                print(f"({exectime:.3f} s)")
         # Pop path and modules loaded from it to avoid clashes with next year
         path = sys.path.pop()
         for name, m in sys.modules.copy().items():
