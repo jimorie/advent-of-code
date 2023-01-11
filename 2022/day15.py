@@ -6,7 +6,7 @@ def read_grid():
     beacons = set()
     for line in util.readlines():
         sensor, beacon = parse_line(line)
-        sensors[sensor] = manhattan_distance(sensor, beacon)
+        sensors[sensor] = sensor.manhattan_distance(beacon)
         beacons.add(beacon)
     return sensors, beacons
 
@@ -17,10 +17,6 @@ def parse_line(line):
         util.Position(int(words[2][2:-1]), int(words[3][2:-1])),
         util.Position(int(words[8][2:-1]), int(words[9][2:])),
     )
-
-
-def manhattan_distance(p1, p2):
-    return abs(p1.x - p2.x) + abs(p1.y - p2.y)
 
 
 def y_coverage(y, sensors):

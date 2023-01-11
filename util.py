@@ -179,6 +179,9 @@ class Position(Direction):
             if direction != (0, 0, 0):
                 yield self + direction
 
+    def manhattan_distance(self, other):
+        return abs(self.x - other.x) + abs(self.y - other.y)
+
 
 class Grid(dict):
     height = None
