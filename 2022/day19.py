@@ -54,6 +54,10 @@ def dig(costs, state):
         geodes = max(geodes, resources[0])
         if time == 0:
             continue
+        # Can we possibly beat the current record? Assuming we can buy a new
+        # geode robot every round from now.
+        if geodes >= resources[0] + robots[0] * time + ((time - 1) * time) / 2:
+            continue
         # Buy robots!
         for i, cost in enumerate(costs):
             # Do we have enough of this robot already?
@@ -74,7 +78,7 @@ def dig(costs, state):
                     # If we can buy a geode robot, that must be the best!
                     break
                 if i == 1:
-                    # If we can buy a obisidian robot, that must be good too!
+                    # If we can buy an obisidian robot, that must be good too!
                     break
         else:
             # Or save the resources
