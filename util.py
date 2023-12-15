@@ -1,15 +1,23 @@
+from __future__ import annotations
+
 import contextlib
 import functools
 import itertools
 import operator
 import os.path
 import sys
+import typing
 
 from pprint import pprint  # noqa
 
 
+if typing.TYPE_CHECKING:
+    from collections.abc import Callable, Generator, Iterable, Sequence
+    from typing import TextIO
+
+
 @contextlib.contextmanager
-def inputfile():
+def inputfile() -> Generator[TextIO]:
     if len(sys.argv) > 1:
         # Use the provided argument (useful with sample data)
         inputpath = sys.argv[1]
@@ -34,17 +42,17 @@ def inputfile():
         yield f
 
 
-def readlines():
+def readlines() -> Generator[str]:
     with inputfile() as f:
         return (line.strip() for line in f.readlines())
 
 
-def read():
+def read() -> str:
     with inputfile() as f:
         return f.read()
 
 
-def readchunks():
+def readchunks() -> Generator[str]:
     with inputfile() as f:
         chunk = ""
         for line in f.readlines():
@@ -57,7 +65,7 @@ def readchunks():
             yield chunk
 
 
-def readlinegroups(lines_per_group):
+def readlinegroups(lines_per_group) -> Generator[str]:
     group = []
     for line in readlines():
         group.append(line)
@@ -66,21 +74,21 @@ def readlinegroups(lines_per_group):
             group = []
 
 
-def readints():
+def readints() -> Generator[int]:
     for line in readlines():
         for n in line.split(","):
             yield int(n)
 
 
-def prod(numbers):
+def prod(numbers: Iterable[int]) -> int:
     return functools.reduce(operator.mul, numbers)
 
 
-def count(validator, iterable):
+def count(validator: Callable, iterable: Iterable) -> int:
     return sum(1 for item in iterable if item and validator(item))
 
 
-def unique_product(args, index=0):
+def unique_product(args: Sequence[Sequence], index: int = 0) -> Generator[tuple]:
     if index >= len(args):
         yield tuple()
     else:
@@ -94,17 +102,17 @@ class Vector(tuple):
     def __new__(cls, *args):
         return super().__new__(cls, args)
 
-    def __add__(self, other):
+    def __add__(self, other: tuple | int) -> Vector:
         if isinstance(other, int):
             return self.__class__(*(a + other for a in self))
         return self.__class__(*(a + b for a, b in zip(self, other)))
 
-    def __sub__(self, other):
+    def __sub__(self, other: tuple | int) -> Vector:
         if isinstance(other, int):
             return self.__class__(*(a - other for a in self))
         return self.__class__(*(a - b for a, b in zip(self, other)))
 
-    def __mul__(self, other):
+    def __mul__(self, other: tuple | int) -> Vector:
         if isinstance(other, int):
             return self.__class__(*(a * other for a in self))
         return self.__class__(*(a * b for a, b in zip(self, other)))
@@ -112,18 +120,18 @@ class Vector(tuple):
 
 class Direction(Vector):
     @property
-    def x(self):
+    def x(self) -> int:
         return self[0]
 
     @property
-    def y(self):
+    def y(self) -> int:
         return self[1]
 
     @property
-    def z(self):
+    def z(self) -> int:
         return self[2]
 
-    def rotate(self, rotation=1):
+    def rotate(self, rotation: int = 1) -> Direction:
         return self.CARDINALS[
             (self.CARDINALS.index(self) + rotation) % len(self.CARDINALS)
         ]
@@ -151,35 +159,35 @@ Direction.CARDINALS_3D = Direction.CARDINALS + (Direction.UP, Direction.DOWN)
 
 class Position(Direction):
     @property
-    def cardinals(self):
+    def cardinals(self) -> Generator[Position]:
         for direction in self.CARDINALS:
             yield self + direction
 
     @property
-    def ordinals(self):
+    def ordinals(self) -> Generator[Position]:
         for direction in self.ORDINALS:
             yield self + direction
 
     @property
-    def neighbours(self):
+    def neighbours(self) -> Generator[Position]:
         for direction in itertools.product(*((0, 1, -1),) * 2):
             if direction != (0, 0):
                 yield self + direction
 
     @property
-    def cardinals_3d(self):
+    def cardinals_3d(self) -> Generator[Position]:
         for pos in self.cardinals:
             yield pos
         yield self + self.UP
         yield self + self.DOWN
 
     @property
-    def neighbours_3d(self):
+    def neighbours_3d(self) -> Generator[Position]:
         for direction in itertools.product(*((0, 1, -1),) * 3):
             if direction != (0, 0, 0):
                 yield self + direction
 
-    def manhattan_distance(self, other):
+    def manhattan_distance(self, other: Position) -> int:
         return abs(self.x - other.x) + abs(self.y - other.y)
 
 

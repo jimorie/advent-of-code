@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import operator
 import util
+
 
 DIGITS = {str(n): str(n) for n in range(10)}
 NUMERALS = {
@@ -15,7 +18,11 @@ NUMERALS = {
 }
 
 
-def read_values(valid):
+def read_values(valid: dict[str, str]) -> util.Generator[int]:
+    """
+    Yield the sum of the first and last valid numbers of each line in the
+    input.
+    """
     for line in util.readlines():
         indices = [(n, line.find(n), line.rfind(n)) for n in valid if n in line]
         first, *_ = min(indices, key=operator.itemgetter(1))

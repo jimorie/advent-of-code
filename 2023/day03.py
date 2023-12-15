@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import util
 
 
@@ -6,7 +8,8 @@ class Schematic:
         self.grid: dict[util.Position, str] = {
             util.Position(x, y): char
             for y, line in enumerate(util.readlines())
-            for x, char in enumerate(line) if char != "."
+            for x, char in enumerate(line)
+            if char != "."
         }
 
     def read_number(self, pos: util.Position) -> tuple[int, set[util.Position]]:
@@ -30,7 +33,7 @@ class Schematic:
                 next_pos += dir
         return int(number), positions
 
-    def find_part_numbers(self, pos) -> "Generator[int]":
+    def find_part_numbers(self, pos) -> util.Generator[int]:
         """Yield all numbers adjacent to `pos`."""
         seen = set()
         for neighbour in pos.neighbours:
@@ -41,14 +44,14 @@ class Schematic:
                 yield number
                 seen.update(positions)
 
-    def find_all_part_numbers(self) -> "Generator[int]":
+    def find_all_part_numbers(self) -> util.Generator[int]:
         """Yield all numbers adjacent to a non-number."""
         for pos, char in self.grid.items():
             if char.isdigit():
                 continue
             yield from self.find_part_numbers(pos)
 
-    def find_gear_ratios(self) -> "Generator[int]":
+    def find_gear_ratios(self) -> util.Generator[int]:
         """
         Yield the product of the two numbers adjacent to each `*`, where there
         are exactly two numbers adjacent.
