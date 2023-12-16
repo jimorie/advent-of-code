@@ -98,6 +98,15 @@ def unique_product(args: Sequence[Sequence], index: int = 0) -> Generator[tuple]
                     yield (arg,) + suffix
 
 
+def batched(iterable, n):
+    # batched('ABCDEFG', 3) --> ABC DEF G
+    if n < 1:
+        raise ValueError("n must be at least one")
+    it = iter(iterable)
+    while batch := tuple(itertools.islice(it, n)):
+        yield batch
+
+
 class Vector(tuple):
     def __new__(cls, *args):
         return super().__new__(cls, args)
