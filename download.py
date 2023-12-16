@@ -28,7 +28,9 @@ if __name__ == "__main__":
     if not py_path.exists():
         print(f"Writing empty solution file {py_path}")
         py_path.write_text(
-"""import util
+"""from __future__ import annotations
+
+import util
 
 
 if __name__ == "__main__":
