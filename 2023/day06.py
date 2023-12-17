@@ -12,7 +12,7 @@ def read_races() -> util.Generator[tuple[int, int]]:
 
 
 def read_races_2() -> util.Generator[tuple[int, int]]:
-    """Yield the only rance a tuple with the time and distance."""
+    """Yield the only race as a tuple with the time and distance."""
     times, distances = util.read().strip().split("\n")
     time = int("".join(times.split()[1:]))
     distance = int("".join(distances.split()[1:]))
