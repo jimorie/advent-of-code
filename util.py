@@ -80,6 +80,11 @@ def readints() -> Generator[int]:
             yield int(n)
 
 
+def readintlines(delimiter=None) -> Generator[list[int]]:
+    for line in readlines():
+        yield [int(n) for n in line.split(delimiter)]
+
+
 def prod(numbers: Iterable[int]) -> int:
     return functools.reduce(operator.mul, numbers)
 
