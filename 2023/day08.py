@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
     # For part 2 we observe that it is enough to count the number of steps of
     # each path individually, and that the number of steps needed to satisfy
-    # all the scenarios simultaneously is their least common multiplier.
+    # all the scenarios simultaneously is their least common multiple.
     nodes = [node for node in map if node.endswith("A")]
     goalcheck = lambda node: node.endswith("Z")
     steps = [count_steps(directions, map, node, goalcheck) for node in nodes]
