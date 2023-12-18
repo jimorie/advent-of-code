@@ -98,6 +98,13 @@ def unique_product(args: Sequence[Sequence], index: int = 0) -> Generator[tuple]
                     yield (arg,) + suffix
 
 
+def pairwise(iterable):
+    # pairwise('ABCDEFG') --> AB BC CD DE EF FG
+    a, b = itertools.tee(iterable)
+    next(b, None)
+    return zip(a, b)
+
+
 def batched(iterable, n):
     # batched('ABCDEFG', 3) --> ABC DEF G
     if n < 1:
