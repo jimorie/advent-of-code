@@ -22,6 +22,7 @@ if __name__ == "__main__":
     year_dir = pathlib.Path(__file__).parent / str(year)
     day_padded = f"day{day:02}"
     input_path = year_dir / "input" / day_padded
+    input_path.parent.mkdir(parents=True, exist_ok=True)
     input_path.write_bytes(response.read())
     print(f"Fetching input file {input_path}")
     py_path = year_dir / f"{day_padded}.py"
