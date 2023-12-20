@@ -157,6 +157,14 @@ class Direction(Vector):
             (self.CARDINALS.index(self) + rotation) % len(self.CARDINALS)
         ]
 
+    def rotation(self, other: Direction) -> int:
+        delta = self.CARDINALS.index(other) - self.CARDINALS.index(self)
+        if delta > 2:
+            delta -= 4
+        elif delta < -2:
+            delta += 4
+        return delta
+
 
 Direction.EAST = Direction(1, 0, 0)
 Direction.SOUTH = Direction(0, 1, 0)
@@ -179,6 +187,11 @@ Direction.CARDINALS_3D = Direction.CARDINALS + (Direction.UP, Direction.DOWN)
 
 
 class Position(Direction):
+    def __sub__(self, other: tuple | int) -> Vector:
+        if isinstance(other, Position):
+            return Direction(self.x - other.x, self.y - other.y, 0)
+        return super().__sub__(other)
+
     @property
     def cardinals(self) -> Generator[Position]:
         for direction in self.CARDINALS:
