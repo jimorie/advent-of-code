@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import collections
 import util
 
 
@@ -27,10 +26,10 @@ def read_pipes() -> tuple[Pipes, util.Position]:
     start = None
     for y, line in enumerate(util.readlines()):
         for x, c in enumerate(line):
+            pos = util.Position(x, y)
+            pipes[pos] = PIPES.get(c)
             if c == "S":
-                start = util.Position(x, y)
-            elif c in PIPES:
-                pipes[util.Position(x, y)] = PIPES[c]
+                start = pos
     # Fill in the exits for the start position
     start_exits = tuple()
     for dir in util.Direction.CARDINALS:
@@ -41,67 +40,56 @@ def read_pipes() -> tuple[Pipes, util.Position]:
     return pipes, start
 
 
-def walk(pipes: Pipes, start: util.Position) -> list[util.Position]:
+def walk(pipes: Pipes, start: util.Position) -> set[util.Position]:
     """
-    Walk the `pipes` from the `start` position and return a list of all
+    Walk the `pipes` from the `start` position and return the set of all
     positions included in the loop.
     """
     pos = start
     dir = None
-    visited = [start]
+    visited = {start}
     while True:
         for ex in pipes[pos]:
             if ex.rotate(2) != dir:  # don't go back
                 pos += ex
                 dir = ex
-                visited.append(pos)
+                visited.add(pos)
                 break
         if pos == start:
             break
     return visited
 
 
-def count_turns(visited: list[util.Position]) -> int:
+def scan_inside(pipes: Pipes, visited: set[util.Position]) -> int:
     """
-    Return the sum of all the turns in the `visited` loop, where a right turn
-    equals +1 and a left turn -1.
+    Return the number of positions that is inside the `visited` loop. Do this
+    by scanning the area row by row (the `pipes` insertion order) and note when
+    we cross the `visited` loop (look for north and south exits, since we're
+    heading east). An odd number of crossings means we're currently inside the
+    loop.
     """
-    return sum(
-        dir_a.rotation(dir_b)
-        for dir_a, dir_b in util.pairwise(
-            pos_b - pos_a for pos_a, pos_b in util.pairwise(visited)
-        )
-    )
-
-
-def spot_inner(visited: list[util.Position], inside: int) -> set[util.Position]:
-    """
-    Return a set of all the positions passed on the `inside` of the `visited`
-    loop, expanded to include *all* inner position and not just those directly
-    adjactent to the `visited` loop.
-    """
-    seen = set(visited)
-    for pos_a, pos_b in util.pairwise(visited):
-        dir = pos_b - pos_a
-        dir = dir.rotate(inside)
-        for pos in (pos_a + dir, pos_b + dir):
-            floodfill(pos, seen)
-    return seen.difference(visited)
-
-
-def floodfill(pos: util.Position, seen: set[util.Position]):
-    """
-    Expand the set of `seen` position to include all positions accessible from
-    `pos` without revisiting any `seen` positions (thus not breaking out of the
-    inside of the loop).
-    """
-    queue = collections.deque()
-    queue.append(pos)
-    while queue:
-        pos = queue.popleft()
-        if pos not in seen:
-            seen.add(pos)
-            queue.extend(pos.neighbours)
+    pipes = iter(pipes.items())
+    count = 0
+    inside = False
+    crossing = {
+        util.Direction.NORTH,
+        util.Direction.SOUTH,
+    }
+    for pos, exits in pipes:
+        if pos in visited:
+            if util.Direction.EAST in exits:
+                combined = set(exits)
+                for pos, exits in pipes:
+                    if util.Direction.EAST not in exits:
+                        combined.update(exits)
+                        break
+                if crossing.issubset(combined):
+                    inside = not inside
+            else:
+                inside = not inside
+        else:
+            count += inside
+    return count
 
 
 if __name__ == "__main__":
@@ -111,10 +99,5 @@ if __name__ == "__main__":
     # The farthest distance is the middle of the loop.
     print(len(visited) // 2)
 
-    # Figure out whether the inside of the loop is on the right or left side
-    # when walking it.
-    inside = 1 if count_turns(visited) > 0 else -1
-
-    # Then walk the loop again and add up all positions accessible on the
-    # inside of the loop.
-    print(len(spot_inner(visited, inside)))
+    # Scan the area for positions inside the loop.
+    print(scan_inside(pipes, visited))
