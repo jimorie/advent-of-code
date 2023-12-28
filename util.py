@@ -36,7 +36,7 @@ def inputfile() -> Generator[TextIO]:
             else:
                 raise RuntimeError("No executing script")
         day, _ = os.path.splitext(filepart)
-        day = day.rstrip("ab")
+        day = day.rstrip("abcde")
         inputpath = os.path.join(dirpart, "input", day)
     with open(inputpath, "r") as f:
         yield f
@@ -234,7 +234,11 @@ class Grid(dict):
         grid = cls()
         for y, row in enumerate(rows):
             for x, value in enumerate(row):
-                grid[Position(x, y)] = cast(value) if cast else value
+                if cast:
+                    value = cast(value)
+                    if value is None:
+                        continue
+                grid[Position(x, y)] = value
         grid.width = x + 1
         grid.height = y + 1
         return grid
@@ -252,6 +256,13 @@ class Grid(dict):
             for y in range(1, self.height - 1)
             for x in range(1, self.width - 1)
         )
+
+    def rotate(self):
+        copy = self.copy()
+        self.clear()
+        for pos, value in copy.items():
+            self[Position(self.height - 1 - pos.y, pos.x)] = value
+        self.height, self.width = self.width, self.height
 
 
 OPERATORS = {
