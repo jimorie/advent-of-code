@@ -230,10 +230,12 @@ class Grid(dict):
     width = None
 
     @classmethod
-    def from_iterable(cls, rows, cast=None):
+    def from_iterable(cls, rows, cast=None, ignore=None):
         grid = cls()
         for y, row in enumerate(rows):
             for x, value in enumerate(row):
+                if ignore and value in ignore:
+                    continue
                 if cast:
                     value = cast(value)
                     if value is None:
@@ -248,6 +250,9 @@ class Grid(dict):
             if value == other:
                 return pos
         raise ValueError(f"{other} is not in Grid")
+
+    def is_inside(self, pos: Position):
+        return 0 <= pos.x < self.width and 0 <= pos.y < self.height
 
     @property
     def inner(self):
