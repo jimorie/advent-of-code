@@ -275,4 +275,6 @@ OPERATORS = {
     "-": operator.sub,
     "*": operator.mul,
     "/": operator.floordiv,
+    "<": operator.lt,
+    ">": operator.gt,
 }
