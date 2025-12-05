@@ -38,7 +38,7 @@ def find_accessible(
             yield pos
 
 
-def remove_accessible(grid: util.Grid, max_adjacent: int) -> Generator[pos]:
+def remove_accessible(grid: util.Grid, max_adjacent: int) -> Generator[util.Position]:
     """
     Yield and remove each `Position` in `Grid` that has fewer than
     `max_adjacent` `@` characters adjacent to it. This is repeated until no
