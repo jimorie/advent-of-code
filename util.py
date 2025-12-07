@@ -44,7 +44,7 @@ def inputfile() -> Generator[TextIO]:
 
 def readlines() -> Generator[str]:
     with inputfile() as f:
-        return (line.strip() for line in f.readlines())
+        return (line.strip("\n") for line in f.readlines())
 
 
 def read() -> str:
