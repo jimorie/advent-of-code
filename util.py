@@ -193,6 +193,22 @@ class Position(Direction):
         return super().__sub__(other)
 
     @property
+    def north(self) -> Position:
+        return self + Direction.NORTH
+
+    @property
+    def east(self) -> Position:
+        return self + Direction.EAST
+
+    @property
+    def south(self) -> Position:
+        return self + Direction.SOUTH
+
+    @property
+    def west(self) -> Position:
+        return self + Direction.WEST
+
+    @property
     def cardinals(self) -> Generator[Position]:
         for direction in self.CARDINALS:
             yield self + direction
@@ -268,6 +284,14 @@ class Grid(dict):
         for pos, value in copy.items():
             self[Position(self.height - 1 - pos.y, pos.x)] = value
         self.height, self.width = self.width, self.height
+
+    def render(self, blank=" "):
+        print(
+            "\n".join(
+                "".join(str(self.get(Position(x, y), blank)) for x in range(self.width))
+                for y in range(self.height)
+            )
+        )
 
 
 OPERATORS = {
