@@ -1,49 +1,32 @@
 from __future__ import annotations
 
-import collections
-
 import util
 
 
-def read_splitters() -> util.Grid:
-    """Return a Grid with the positions of each splitter in the input."""
-    return util.Grid.from_iterable(util.readlines(), ignore=".")
-
-
-def trace_beams(splitters) -> tuple[int, int]:
+def trace_beams() -> tuple[int, int]:
     """
     Find the starting position and `S` and trace its progress while counting
-    each split and timeline taken by the beam(s).
+    each split and timeline taken by the beam(s) in the input.
     """
+    lines = util.readlines()
+    line = next(lines)
     split_count = 0
-    beams = {}
-    # Find the start
-    for pos, mark in splitters.items():
-        if mark == "S":
-            beams[pos.south] = 1
-            break
-    # Trace beams
-    while beams:
-        next = collections.defaultdict(int)
-        for pos, count in beams.items():
-            new = pos.south
-            if new in splitters:  # Hit a splitter!
-                # Increment the split count
+    beams = [0] * len(line)
+    beams[line.index("S")] = 1
+    for line in lines:
+        for i, c in enumerate(line):
+            if beams[i] and c == "^":
+                # Part 1
                 split_count += 1
-                # Add up the number of paths (timelines) that arrive at the
-                # split points
-                next[new.west] += count
-                next[new.east] += count
-            elif splitters.is_inside(new):
-                # Add up the number of paths (timelines) that arrive here
-                next[new] += count
-        if not next:
-            return split_count, sum(beams.values())
-        beams = next
+
+                # Part 2
+                beams[i - 1] += beams[i]
+                beams[i + 1] += beams[i]
+                beams[i] = 0
+    return split_count, sum(beams)
 
 
 if __name__ == "__main__":
-    splitters = read_splitters()
-    splits, timelines = trace_beams(splitters)
-    print(splits)
+    split_count, timelines = trace_beams()
+    print(split_count)
     print(timelines)
