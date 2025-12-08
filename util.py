@@ -3,6 +3,7 @@ from __future__ import annotations
 import contextlib
 import functools
 import itertools
+import math
 import operator
 import os.path
 import sys
@@ -236,6 +237,11 @@ class Position(Direction):
         for direction in itertools.product(*((0, 1, -1),) * 3):
             if direction != (0, 0, 0):
                 yield self + direction
+
+    def distance_3d(self, other: Position) -> float:
+        return math.sqrt(
+            (self.x - other.x) ** 2 + (self.y - other.y) ** 2 + (self.z - other.z) ** 2
+        )
 
     def manhattan_distance(self, other: Position) -> int:
         return abs(self.x - other.x) + abs(self.y - other.y)
