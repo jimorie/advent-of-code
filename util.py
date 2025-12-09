@@ -221,9 +221,8 @@ class Position(Direction):
 
     @property
     def neighbours(self) -> Generator[Position]:
-        for direction in itertools.product(*((0, 1, -1),) * 2):
-            if direction != (0, 0):
-                yield self + direction
+        for direction in Direction.CARDINALS:
+            yield self + direction
 
     @property
     def cardinals_3d(self) -> Generator[Position]:
