@@ -18,20 +18,12 @@ def read_boxes() -> util.Grid:
     return boxes
 
 
-def calculate_distances(
-    boxes: util.Grid,
-) -> list[Distance]:
+def calculate_distances(boxes: util.Grid) -> list[Distance]:
     """Return a sorted list of distances between each pair of `boxes`."""
-    seen = set()
-    distances = []
-    for a, b in itertools.permutations(boxes, 2):
-        pair = (a, b) if a < b else (b, a)
-        if pair in seen:
-            continue
-        seen.add(pair)
-        distances.append((a.distance_3d(b), pair))
-    distances.sort()
-    return distances
+    return sorted(
+        (pair[0].distance_3d(pair[1]), pair)
+        for pair in itertools.combinations(boxes, 2)
+    )
 
 
 def connect_boxes(
